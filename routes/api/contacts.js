@@ -7,6 +7,7 @@ import validateBody from "../../middlewares/validateBody.js";
 
 import addSchema from "../../schemas/contacts.js";
 
+// validateBody(addSchema);
 router.get("/", contactsCtrl.getAll);
 
 router.get("/:id", contactsCtrl.getById);

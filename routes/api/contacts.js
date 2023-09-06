@@ -1,5 +1,4 @@
 import express from "express";
-const router = express.Router();
 
 import contactsCtrl from "../../controllers/contacts.js";
 
@@ -7,6 +6,8 @@ import validateBody from "../../middlewares/validateBody.js";
 import isValideId from "../../middlewares/isValidId.js";
 
 import addSchema, { updateFavoriteSchema } from "../../models/contact.js";
+
+const router = express.Router();
 
 router.get("/", contactsCtrl.getAll);
 

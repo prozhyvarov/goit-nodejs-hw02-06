@@ -4,6 +4,7 @@ import usersCtrl from "../../controllers/auth.js";
 import validateBody from "../../middlewares/validateBody.js";
 import { registerSchema, loginSchema } from "../../models/user.js";
 import authenticate from "../../middlewares/authenticate.js";
+import upload from "../../middlewares/upload.js";
 
 const router = express.Router();
 
@@ -14,5 +15,7 @@ router.post("/login", validateBody(loginSchema), usersCtrl.login);
 router.get("/current", authenticate, usersCtrl.getCurrent);
 
 router.post("/logout", authenticate, usersCtrl.logout);
+
+router.patch("/avatars", authenticate, upload.single("avatar"), usersCtrl.updateAvatar);
 
 export default router;

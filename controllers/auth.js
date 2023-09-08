@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import gravatar from "gravatar";
+import Jimp from "jimp";
 
 import { User } from "../models/user.js";
 import HttpError from "../helpers/HttpError.js";
@@ -48,8 +49,8 @@ const login = async (req, res) => {
   if (!user) {
     throw HttpError(401, "Email or password invalid");
   }
-    const passwordCompare = await bcrypt.compare(password, user.password);
-    console.log(passwordCompare);
+  const passwordCompare = await bcrypt.compare(password, user.password);
+  console.log(passwordCompare);
   if (!passwordCompare) {
     throw HttpError(401, "Email or password invalid");
   }
@@ -58,36 +59,41 @@ const login = async (req, res) => {
     id: user._id,
   };
 
-  const token = jwt.sign(payload, SECRET_KEY, {expiresIn: "23h"});
-    await User.findByIdAndUpdate(user._id, { token });
-    
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+  await User.findByIdAndUpdate(user._id, { token });
+
   res.json({
     token,
   });
 };
 
-
 const getCurrent = async (req, res) => {
-    const { email, name } = req.user;
+  const { email, name } = req.user;
 
-    res.json({
-        email,
-        name,
-    })
-}
+  res.json({
+    email,
+    name,
+  });
+};
 
 const logout = async (req, res) => {
-    const { _id } = req.user;
-    await User.findByIdAndUpdate(_id, { token: "" });
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
 
-    res.json({
-        message: "Logout success"
-    })
-}
+  res.json({
+    message: "Logout success",
+  });
+};
 
 const updateAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: tempUpload, originalname } = req.file;
+  const img = await Jimp.read(tempUpload);
+  await img
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE)
+    .writeAsync(tempUpload);
+
   const filename = `${_id}_${originalname}`;
   const resultUpload = path.join(avatarsDir, filename);
   await fs.rename(tempUpload, resultUpload);
@@ -97,7 +103,7 @@ const updateAvatar = async (req, res) => {
   res.json({
     avatarURL,
   });
-}
+};
 
 export default {
   register: ctrlWrapper(register),

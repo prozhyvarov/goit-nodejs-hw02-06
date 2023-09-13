@@ -29,6 +29,14 @@ const userSchema = new Schema(
     },
     token: String,
     avatarURL: String,
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      required: [true, "Verify token is required"],
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -59,6 +67,16 @@ export const loginSchema = Joi.object({
   }),
   password: Joi.string().min(6).required().messages({
     "any.required": `"password" must be exist`,
+  }),
+});
+
+export const emailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required().messages({
+    "any.required": `Missing required email field`,
+  }),
+
+  password: Joi.string().min(6).required().messages({
+    "any.required": `Missing required password field`,
   }),
 });
 
